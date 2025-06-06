@@ -1,2 +1,4 @@
 # human-personality-predictor
-A machine learning project that classifies personality traits (introvert vs. extrovert) based on social behavior data. The goal is to cover multiple modeling approaches: basic, classical, ensemble, deep learning, and AutoML.
+This project focuses on classifying individuals as Introverts or Extroverts based on their social behavior using structured tabular data.
+It includes a wide range of machine learning approaches — from simple baselines to classical algorithms, ensemble methods, deep learning, and AutoML pipelines.
+The goal is to compare different techniques, analyze their performance, and demonstrate a production-ready ML workflow.
