@@ -9,10 +9,9 @@ os.chdir("..")
 
 class DataLoader:
 
-    def __init__(self, raw_path = 'data/raw/personality_dataset.csv', processed_path="data/processed/data_clean.pkl", scale=True, missing_strategy="fill", random_state=42):
+    def __init__(self, raw_path = 'data/raw/personality_dataset.csv', processed_path="data/processed/data_clean.pkl", missing_strategy="fill", random_state=42):
         self.raw_path = raw_path
         self.processed_path = processed_path
-        self.scale = scale
         self.scaler = StandardScaler()
         self.missing_strategy = missing_strategy
         self.random_state = random_state
@@ -32,15 +31,10 @@ class DataLoader:
 
     def _save_processed(self, X, y):
         return
-        os.makedirs(os.path.dirname(self.processed_path), exist_ok=True)
-        with open(self.processed_path, "wb") as f:
-            pickle.dump((X, y), f)
 
     def _prepare_and_save(self):
         self.data_raw = self._load_raw()
-
         self.X, self.y = self._preprocess()
-
         self._save_processed(self.X, self.y)
 
         return self.X, self.y
@@ -57,7 +51,6 @@ class DataLoader:
             df = preprocessing_dict[self.missing_strategy](df)
         else:
             raise ValueError(f"Unknown missing strategy: {self.missing_strategy}. Must be one of {list(preprocessing_dict.keys())}")
-
         self.data_imputed = df.copy()
 
         # Feature encoding
@@ -65,11 +58,8 @@ class DataLoader:
         df['Drained_after_socializing'] = df['Drained_after_socializing'].map({'Yes':1,'No':0})
         df['Personality'] = df['Personality'].map({'Introvert':1,'Extrovert':0})
 
-        # Scaling
         y = df["Personality"]
         X = df.drop(columns=["Personality"])
-        if self.scale:
-            X = pd.DataFrame(self.scaler.fit_transform(X), columns=X.columns)
 
         return X, y
 
@@ -98,8 +88,14 @@ class DataLoader:
         df = df.dropna()
         return df
     
-    def get_data_train_test(self, test_size=0.2):
-        X_train, X_test, y_train, y_test = train_test_split(self.X, self.y, test_size=0.2, random_state=self.random_state)
+    def get_data_train_test(self, scaled=True, test_size=0.2):
+        
+        if scaled:
+            X = pd.DataFrame(self.scaler.fit_transform(self.X), columns=self.X.columns)
+        else :
+            X = self.X
+        
+        X_train, X_test, y_train, y_test = train_test_split(X, self.y, test_size=0.2, random_state=self.random_state)
         return X_train, X_test, y_train, y_test
     
     def get_data_imputed(self):
