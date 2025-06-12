@@ -95,7 +95,7 @@ class DataLoader:
         else :
             X = self.X
         
-        X_train, X_test, y_train, y_test = train_test_split(X, self.y, test_size=0.2, random_state=self.random_state)
+        X_train, X_test, y_train, y_test = train_test_split(X, self.y, test_size=test_size, random_state=self.random_state)
         return X_train, X_test, y_train, y_test
     
     def get_data_imputed(self):
