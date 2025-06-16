@@ -6,7 +6,7 @@ class BaseModel(ABC):
         self.name = name
         self.model = None
         self.random_state = 42
-        self.cv = 3
+        self.cv = 5
         self.n_iter = 40
 
     @abstractmethod
