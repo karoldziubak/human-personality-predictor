@@ -8,10 +8,10 @@ class LogisticRegressionModel(BaseModel):
         self.param_grid = param_grid
 
     def build_model(self):
-        self.model = LogisticRegression(random_state=42)
+        self.model = LogisticRegression(random_state=self.random_state)
 
         # Hyperparameter tuning
         if self.param_grid:
-            self.model = RandomizedSearchCV(estimator=self.model, param_distributions=self.param_grid, n_iter=10, scoring='f1_weighted', cv=5, n_jobs=-1, random_state=42)
+            self.model = RandomizedSearchCV(estimator=self.model, param_distributions=self.param_grid, n_iter=20, scoring='f1_weighted', cv=3, n_jobs=-1, random_state=self.random_state)
         else:
             self.model = self.model

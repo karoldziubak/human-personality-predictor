@@ -9,38 +9,27 @@ os.chdir("..")
 
 class DataLoader:
 
-    def __init__(self, raw_path = 'data/raw/personality_dataset.csv', processed_path="data/processed/data_clean.pkl", missing_strategy="fill", random_state=42):
+    def __init__(self, raw_path = 'data/raw/personality_dataset.csv', missing_strategy="fill", random_state=42):
         self.raw_path = raw_path
-        self.processed_path = processed_path
         self.scaler = StandardScaler()
         self.missing_strategy = missing_strategy
         self.random_state = random_state
         
-        if os.path.exists(self.processed_path) and os.path.exists(self.raw_path):
-            self.X, self.y = self._load_processed()
-            self.data_raw = self._load_raw()
-        else:
-            self.X, self.y = self._prepare_and_save()
+        self.data_raw = self._load_raw()
+        self.X, self.y = self._preprocess()
 
     def _load_raw(self):
         return pd.read_csv(self.raw_path)
-    
-    def _load_processed(self):
-        with open(self.processed_path, "rb") as f:
-            return pickle.load(f)
-
-    def _save_processed(self, X, y):
-        return
-
-    def _prepare_and_save(self):
-        self.data_raw = self._load_raw()
-        self.X, self.y = self._preprocess()
-        self._save_processed(self.X, self.y)
-
-        return self.X, self.y
 
     def _preprocess(self):
         df = self.data_raw.copy()
+
+        df['Stage_fear'] = df['Stage_fear'].map({'Yes':1,'No':0})
+        df['Drained_after_socializing'] = df['Drained_after_socializing'].map({'Yes':1,'No':0})
+        df['Personality'] = df['Personality'].map({'Introvert':1,'Extrovert':0})
+
+        # Drop duplicates
+        df = df.drop_duplicates()
 
         # Missing values
         preprocessing_dict = {
@@ -52,11 +41,6 @@ class DataLoader:
         else:
             raise ValueError(f"Unknown missing strategy: {self.missing_strategy}. Must be one of {list(preprocessing_dict.keys())}")
         self.data_imputed = df.copy()
-
-        # Feature encoding
-        df['Stage_fear'] = df['Stage_fear'].map({'Yes':1,'No':0})
-        df['Drained_after_socializing'] = df['Drained_after_socializing'].map({'Yes':1,'No':0})
-        df['Personality'] = df['Personality'].map({'Introvert':1,'Extrovert':0})
 
         y = df["Personality"]
         X = df.drop(columns=["Personality"])
@@ -71,16 +55,16 @@ class DataLoader:
 
         # Fill missing values, numeric with mean, categorical with mode
         for col in num_cols:
-            extrovert_mean = df[df.Personality=='Extrovert'][col].mean()
-            df.loc[df.Personality == 'Extrovert', col] = df.loc[df.Personality == 'Extrovert', col].fillna(extrovert_mean)
-            introvert_mean = df[df.Personality=='Introvert'][col].mean()
-            df.loc[df.Personality == 'Introvert', col] = df.loc[df.Personality == 'Introvert', col].fillna(introvert_mean)
+            extrovert_mean = df[df.Personality==0][col].mean()
+            df.loc[df.Personality == 0, col] = df.loc[df.Personality == 0, col].fillna(extrovert_mean)
+            introvert_mean = df[df.Personality==1][col].mean()
+            df.loc[df.Personality == 1, col] = df.loc[df.Personality == 1, col].fillna(introvert_mean)
         
         for col in cat_cols:
-            extrovert_mode = df[df.Personality=='Extrovert'][col].mode()[0]
-            df.loc[df.Personality == 'Extrovert', col] = df.loc[df.Personality == 'Extrovert', col].fillna(extrovert_mode)
-            introvert_mode = df[df.Personality=='Introvert'][col].mode()[0]
-            df.loc[df.Personality == 'Introvert', col] = df.loc[df.Personality == 'Introvert', col].fillna(introvert_mode)
+            extrovert_mode = df[df.Personality==0][col].mode()[0]
+            df.loc[df.Personality == 0, col] = df.loc[df.Personality == 0, col].fillna(extrovert_mode)
+            introvert_mode = df[df.Personality==1][col].mode()[0]
+            df.loc[df.Personality == 1, col] = df.loc[df.Personality == 1, col].fillna(introvert_mode)
 
         return df
 
@@ -89,13 +73,12 @@ class DataLoader:
         return df
     
     def get_data_train_test(self, scaled=True, test_size=0.2):
+        X_train, X_test, y_train, y_test = train_test_split(self.X, self.y, test_size=test_size, random_state=self.random_state)
         
         if scaled:
-            X = pd.DataFrame(self.scaler.fit_transform(self.X), columns=self.X.columns)
-        else :
-            X = self.X
-        
-        X_train, X_test, y_train, y_test = train_test_split(X, self.y, test_size=test_size, random_state=self.random_state)
+            X_train = pd.DataFrame(self.scaler.fit_transform(X_train), columns=X_train.columns)
+            X_test = pd.DataFrame(self.scaler.transform(X_test), columns=X_test.columns)
+
         return X_train, X_test, y_train, y_test
     
     def get_data_imputed(self):

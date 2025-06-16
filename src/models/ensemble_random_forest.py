@@ -8,10 +8,10 @@ class RandomForestModel(BaseModel):
         self.param_grid = param_grid
 
     def build_model(self):
-        base_model = RandomForestClassifier(random_state=42)
+        base_model = RandomForestClassifier(random_state=self.random_state)
         
         # Hyperparameter tuning
         if self.param_grid:
-            self.model = RandomizedSearchCV(estimator=base_model, param_distributions=self.param_grid, n_iter=10, scoring='f1_weighted', cv=5, n_jobs=-1, random_state=42)
+            self.model = RandomizedSearchCV(estimator=base_model, param_distributions=self.param_grid, n_iter=20, scoring='f1_weighted', cv=3, n_jobs=-1, random_state=self.random_state)
         else:
             self.model = base_model

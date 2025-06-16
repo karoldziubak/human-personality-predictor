@@ -5,6 +5,7 @@ class BaseModel(ABC):
     def __init__(self, name):
         self.name = name
         self.model = None
+        self.random_state = 42
 
     @abstractmethod
     def build_model(self):
