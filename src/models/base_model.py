@@ -7,7 +7,7 @@ class BaseModel(ABC):
         self.model = None
         self.random_state = 42
         self.cv = 3
-        self.n_iter = 60
+        self.n_iter = 40
 
     @abstractmethod
     def build_model(self):
