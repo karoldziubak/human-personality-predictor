@@ -5,11 +5,11 @@ import numpy as np
 
 model_parameters = {
     'random_forest': {
-        'model': RandomForestModel(param_grid={'n_estimators': [100, 150, 200], 'max_depth': [None, 2, 4, 6, 8, 10, 12], 'min_samples_split': [5, 7, 9, 11]}),
+        'model': RandomForestModel(param_grid={'n_estimators': [100, 150, 200, 250, 300], 'max_depth': [None, 2, 4, 6, 8, 10], 'min_samples_split': [5, 7, 9, 11]}),
         'scaled': False,
         },
     'xgboost': {
-        'model': XGBoostModel(param_grid={'n_estimators': [100, 150], 'learning_rate': [0.05, 0.1], 'max_depth': [3, 5], 'subsample': [0.8]}),
+        'model': XGBoostModel(param_grid={'n_estimators': [100, 150, 200, 250, 300], 'learning_rate': [0.01, 0.05, 0.1, 0.2, 0.3], 'max_depth': [None, 2, 4, 6, 8, 10], 'subsample': [0.5, 0.8, 1.0]}),
         'scaled': False,
         },
     'logistic_regression': {

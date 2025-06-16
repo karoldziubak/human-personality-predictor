@@ -12,6 +12,6 @@ class LogisticRegressionModel(BaseModel):
 
         # Hyperparameter tuning
         if self.param_grid:
-            self.model = RandomizedSearchCV(estimator=self.model, param_distributions=self.param_grid, n_iter=20, scoring='f1_weighted', cv=self.cv, n_jobs=-1, random_state=self.random_state)
+            self.model = RandomizedSearchCV(estimator=self.model, param_distributions=self.param_grid, n_iter=self.n_iter, scoring='f1_weighted', cv=self.cv, n_jobs=-1, random_state=self.random_state)
         else:
             self.model = self.model
