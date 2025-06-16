@@ -1,10 +1,15 @@
-from src.models.random_forest import RandomForestModel
-from src.models.logistic_regression import LogisticRegressionModel
+from src.models.ensemble_random_forest import RandomForestModel
+from src.models.baseline_logistic_regression import LogisticRegressionModel
+from src.models.ensemble_xgboost import XGBoostModel
 import numpy as np
 
 model_parameters = {
     'random_forest': {
         'model': RandomForestModel(param_grid={'n_estimators': [100, 150, 200], 'max_depth': [None, 2, 4, 6, 8, 10, 12], 'min_samples_split': [5, 7, 9, 11]}),
+        'scaled': False,
+        },
+    'xgboost': {
+        'model': XGBoostModel(param_grid={'n_estimators': [100, 150], 'learning_rate': [0.05, 0.1], 'max_depth': [3, 5], 'subsample': [0.8]}),
         'scaled': False,
         },
     'logistic_regression': {
