@@ -6,6 +6,7 @@ class BaseModel(ABC):
         self.name = name
         self.model = None
         self.random_state = 42
+        self.cv = 3
 
     @abstractmethod
     def build_model(self):
